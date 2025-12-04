@@ -22,16 +22,6 @@ class PusherBroadcaster implements BroadcasterInterface
             'useTLS' => true,
         ];
 
-        // Отключаем проверку SSL сертификатов в development окружении
-        // для решения проблемы с локальными сертификатами на Windows
-        if (($_ENV['APP_ENV'] ?? 'production') === 'development' || 
-            ($_ENV['PUSHER_DISABLE_SSL_VERIFY'] ?? 'false') === 'true') {
-            $options['curl_options'] = [
-                CURLOPT_SSL_VERIFYPEER => false,
-                CURLOPT_SSL_VERIFYHOST => false,
-            ];
-        }
-
         $this->pusher = new Pusher(
             $_ENV['PUSHER_KEY'] ?? 'app-key',
             $_ENV['PUSHER_SECRET'] ?? 'app-secret',
