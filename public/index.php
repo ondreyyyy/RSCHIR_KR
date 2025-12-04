@@ -51,6 +51,29 @@ $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 header('Content-Type: application/json; charset=utf-8');
 
 try {
+    // Обработка корневого маршрута
+    if ($path === '/' && $method === 'GET') {
+        $baseUrl = 'http://' . $_SERVER['HTTP_HOST'];
+        
+        echo json_encode([
+            'message' => 'Game Profiles API',
+            'version' => '1.0.0',
+            'endpoints' => [
+                'GET /profiles' => 'List profiles',
+                'GET /profiles/{id}' => 'Get profile by ID',
+                'POST /profiles' => 'Create profile',
+                'DELETE /profiles/{id}' => 'Delete profile',
+                'POST /stats/update' => 'Update stats with WebSocket broadcast',
+                'POST /import/from-steam' => 'Import from Steam API',
+                'GET /pusher-config' => 'Get Pusher config'
+            ],
+            'ui' => $baseUrl . '/ui.php',
+            'realtime_test' => $baseUrl . '/realtime-test.html',
+            'documentation' => 'See README.md for detailed API documentation'
+        ], JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
     if ($path === '/profiles' && $method === 'GET') {
         $limit = (int) ($_GET['limit'] ?? 50);
         $offset = (int) ($_GET['offset'] ?? 0);
