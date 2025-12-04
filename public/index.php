@@ -11,6 +11,7 @@ use App\Application\UseCase\UpdateStatsAndBroadcastUseCase;
 use App\Domain\Profile;
 use App\Infrastructure\Broadcast\PusherBroadcaster;
 use App\Infrastructure\Persistence\PdoProfileRepository;
+use App\Infrastructure\Security\InputValidator;
 use App\Infrastructure\Steam\SteamHttpClient;
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -53,7 +54,9 @@ try {
     if ($path === '/profiles' && $method === 'GET') {
         $limit = (int) ($_GET['limit'] ?? 50);
         $offset = (int) ($_GET['offset'] ?? 0);
-        $profiles = $listProfiles->execute($limit, $offset);
+        // Валидация параметров пагинации
+        [$validLimit, $validOffset] = InputValidator::validatePaginationParams($limit, $offset);
+        $profiles = $listProfiles->execute($validLimit, $validOffset);
 
         $data = array_map(function (Profile $profile) {
             return [
@@ -70,6 +73,8 @@ try {
 
     if (preg_match('#^/profiles/(\d+)$#', $path, $matches)) {
         $id = (int) $matches[1];
+        // Валидация ID
+        $id = InputValidator::validateProfileId($id);
 
         if ($method === 'GET') {
             $profile = $getProfile->execute($id);
@@ -119,6 +124,8 @@ try {
     if ($path === '/stats/update' && $method === 'POST') {
         $body = json_decode(file_get_contents('php://input'), true, 512, JSON_THROW_ON_ERROR);
         $id = (int) ($body['id'] ?? 0);
+        // Валидация ID
+        $id = InputValidator::validateProfileId($id);
 
         try {
             $updated = $updateStatsAndBroadcast->execute($id, $body['stats'] ?? []);

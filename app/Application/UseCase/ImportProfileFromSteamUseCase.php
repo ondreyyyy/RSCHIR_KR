@@ -6,6 +6,7 @@ use App\Application\Ports\SteamClientInterface;
 use App\Domain\Profile;
 use App\Domain\ProfileRepositoryInterface;
 use App\Domain\Stats;
+use App\Infrastructure\Security\InputValidator;
 
 class ImportProfileFromSteamUseCase
 {
@@ -20,7 +21,11 @@ class ImportProfileFromSteamUseCase
      */
     public function execute(string $apiKey, string $steamId): Profile
     {
-        $data = $this->steamClient->fetchProfile($apiKey, $steamId);
+        // Валидация Steam API ключа и SteamID
+        $validatedApiKey = InputValidator::validateSteamApiKey($apiKey);
+        $validatedSteamId = InputValidator::validateSteamId($steamId);
+        
+        $data = $this->steamClient->fetchProfile($validatedApiKey, $validatedSteamId);
 
         $profile = $this->profiles->findByExternalId($data['external_id']);
 

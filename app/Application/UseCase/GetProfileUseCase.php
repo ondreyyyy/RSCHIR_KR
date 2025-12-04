@@ -4,6 +4,7 @@ namespace App\Application\UseCase;
 
 use App\Domain\Profile;
 use App\Domain\ProfileRepositoryInterface;
+use App\Infrastructure\Security\InputValidator;
 
 class GetProfileUseCase
 {
@@ -14,7 +15,10 @@ class GetProfileUseCase
 
     public function execute(int $id): ?Profile
     {
-        return $this->profiles->findById($id);
+        // Валидация ID профиля
+        $validatedId = InputValidator::validateProfileId($id);
+        
+        return $this->profiles->findById($validatedId);
     }
 }
 

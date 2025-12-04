@@ -6,6 +6,7 @@ use App\Application\Ports\BroadcasterInterface;
 use App\Domain\Profile;
 use App\Domain\ProfileRepositoryInterface;
 use App\Domain\Stats;
+use App\Infrastructure\Security\InputValidator;
 
 class UpdateStatsAndBroadcastUseCase
 {
@@ -20,13 +21,19 @@ class UpdateStatsAndBroadcastUseCase
      */
     public function execute(int $profileId, array $statsData): Profile
     {
-        $profile = $this->profiles->findById($profileId);
+        // Валидация ID профиля
+        $validatedProfileId = InputValidator::validateProfileId($profileId);
+        
+        // Валидация статистики
+        $validatedStats = InputValidator::validateStats($statsData);
+
+        $profile = $this->profiles->findById($validatedProfileId);
 
         if (!$profile) {
             throw new \RuntimeException('Profile not found');
         }
 
-        $profile->setStats(Stats::fromArray($statsData));
+        $profile->setStats(Stats::fromArray($validatedStats));
         $updated = $this->profiles->update($profile);
 
         // Уникальный функционал: broadcast события обновления статов

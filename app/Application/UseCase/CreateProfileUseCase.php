@@ -5,6 +5,7 @@ namespace App\Application\UseCase;
 use App\Domain\Profile;
 use App\Domain\ProfileRepositoryInterface;
 use App\Domain\Stats;
+use App\Infrastructure\Security\InputValidator;
 
 class CreateProfileUseCase
 {
@@ -15,12 +16,17 @@ class CreateProfileUseCase
 
     public function execute(string $externalId, string $nickname, array $statsData): Profile
     {
-        $stats = Stats::fromArray($statsData);
+        // Валидация и санитизация входных данных (защита от XSS)
+        $validatedExternalId = InputValidator::validateExternalId($externalId);
+        $validatedNickname = InputValidator::validateNickname($nickname);
+        $validatedStats = InputValidator::validateStats($statsData);
+
+        $stats = Stats::fromArray($validatedStats);
 
         $profile = new Profile(
             id: null,
-            externalId: $externalId,
-            nickname: $nickname,
+            externalId: $validatedExternalId,
+            nickname: $validatedNickname,
             stats: $stats
         );
 

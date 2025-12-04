@@ -3,6 +3,7 @@
 namespace App\Application\UseCase;
 
 use App\Domain\ProfileRepositoryInterface;
+use App\Infrastructure\Security\InputValidator;
 
 class DeleteProfileUseCase
 {
@@ -16,13 +17,16 @@ class DeleteProfileUseCase
      */
     public function execute(int $id): void
     {
-        $profile = $this->profiles->findById($id);
+        // Валидация ID профиля
+        $validatedId = InputValidator::validateProfileId($id);
+        
+        $profile = $this->profiles->findById($validatedId);
         
         if (!$profile) {
             throw new \RuntimeException('Profile not found');
         }
         
-        $this->profiles->delete($id);
+        $this->profiles->delete($validatedId);
     }
 }
 

@@ -13,6 +13,7 @@ class SteamHttpClient implements SteamClientInterface
 {
     public function fetchProfile(string $apiKey, string $steamId): array
     {
+        // Используем urlencode для безопасной передачи параметров в URL
         $steamUrl = sprintf(
             'https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=%s&steamids=%s',
             urlencode($apiKey),
@@ -31,9 +32,13 @@ class SteamHttpClient implements SteamClientInterface
             throw new \RuntimeException('Steam profile not found');
         }
 
+        // Санитизация nickname от потенциального XSS
+        $nickname = $player['personaname'] ?? ('steam_' . $steamId);
+        $nickname = htmlspecialchars(strip_tags($nickname), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        
         return [
             'external_id' => $steamId,
-            'nickname' => $player['personaname'] ?? ('steam_' . $steamId),
+            'nickname' => $nickname,
         ];
     }
 }

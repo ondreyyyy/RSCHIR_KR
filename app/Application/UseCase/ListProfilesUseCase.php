@@ -3,6 +3,7 @@
 namespace App\Application\UseCase;
 
 use App\Domain\ProfileRepositoryInterface;
+use App\Infrastructure\Security\InputValidator;
 
 class ListProfilesUseCase
 {
@@ -13,7 +14,10 @@ class ListProfilesUseCase
 
     public function execute(int $limit = 50, int $offset = 0): array
     {
-        return $this->profiles->list($limit, $offset);
+        // Валидация параметров пагинации
+        [$validLimit, $validOffset] = InputValidator::validatePaginationParams($limit, $offset);
+        
+        return $this->profiles->list($validLimit, $validOffset);
     }
 }
 

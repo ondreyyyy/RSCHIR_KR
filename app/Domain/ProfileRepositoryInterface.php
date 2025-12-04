@@ -24,7 +24,7 @@ interface ProfileRepositoryInterface
      *
      * @return Profile[]
      */
-    public function list(int $limit = 50, int $offset = 0): array;
+     public function list(int $limit = 50, int $offset = 0): array;
 }
 
 
