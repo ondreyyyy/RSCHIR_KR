@@ -8,6 +8,7 @@ use App\Application\UseCase\GetProfileUseCase;
 use App\Application\UseCase\ImportProfileFromSteamUseCase;
 use App\Application\UseCase\ListProfilesUseCase;
 use App\Application\UseCase\UpdateStatsAndBroadcastUseCase;
+use App\Domain\Profile;
 use App\Infrastructure\Broadcast\PusherBroadcaster;
 use App\Infrastructure\Persistence\PdoProfileRepository;
 use App\Infrastructure\Steam\SteamHttpClient;
@@ -88,8 +89,13 @@ try {
         }
 
         if ($method === 'DELETE') {
-            $deleteProfile->execute($id);
-            http_response_code(204);
+            try {
+                $deleteProfile->execute($id);
+                http_response_code(204);
+            } catch (RuntimeException $e) {
+                http_response_code(404);
+                echo json_encode(['error' => $e->getMessage()], JSON_THROW_ON_ERROR);
+            }
             exit;
         }
     }
