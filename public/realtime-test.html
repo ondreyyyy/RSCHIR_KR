@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Синхронизация</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-top: 0;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .status.connected {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .status.error {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .events {
+            margin-top: 20px;
+        }
+        .event {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+        }
+        .event-time {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .event-data {
+            margin-top: 10px;
+            font-family: monospace;
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+        .instructions {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .instructions h3 {
+            margin-top: 0;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Синхронизация профилей в реальном времени</h1>
+        
+        <div class="instructions">
+            <h3>Инструкция по тестированию:</h3>
+            <ol>
+                <li>Введи ключи Pusher ниже (или оставь пустыми для теста без подключения)</li>
+                <li>Нажми "Подключиться к Pusher"</li>
+                <li>Открой в другом окне/вкладке: <a href="ui.php" target="_blank">ui.php</a></li>
+                <li>В ui.php обнови статистику любого профиля</li>
+                <li>Вернись сюда - ты увидишь событие в реальном времени!</li>
+            </ol>
+        </div>
+
+        <div>
+            <label>Pusher Key: <input type="text" id="pusherKey" placeholder="твой_key"></label><br>
+            <label>Pusher Cluster: <input type="text" id="pusherCluster" placeholder="mt1" value="mt1"></label><br>
+            <button id="connectBtn" onclick="connect()">Подключиться к Pusher</button>
+            <button id="disconnectBtn" onclick="disconnect()" disabled>Отключиться</button>
+        </div>
+
+        <div id="status" class="status disconnected">Не подключено</div>
+
+        <div class="events">
+            <h2>События в реальном времени:</h2>
+            <div id="eventsList"></div>
+        </div>
+    </div>
+
+    <!-- Pusher JS SDK -->
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    
+    <script>
+        let pusher = null;
+        let channel = null;
+
+        function connect() {
+            const key = document.getElementById('pusherKey').value;
+            const cluster = document.getElementById('pusherCluster').value || 'mt1';
+
+            if (!key) {
+                alert('Введи Pusher Key! Если у тебя нет ключей, можешь:\n1. Зарегистрироваться на https://dashboard.pusher.com/\n2. Создать приложение\n3. Скопировать ключи в .env и сюда');
+                return;
+            }
+
+            // Отключаемся от предыдущего подключения, если есть
+            if (pusher) {
+                disconnect();
+            }
+
+            try {
+                // Инициализация Pusher
+                pusher = new Pusher(key, {
+                    cluster: cluster,
+                    encrypted: true
+                });
+
+                // Обновляем статус
+                updateStatus('connected', 'Подключено к Pusher');
+
+                // Подписываемся на канал 'profiles'
+                channel = pusher.subscribe('profiles');
+                
+                // Слушаем событие 'stats.updated'
+                channel.bind('stats.updated', function(data) {
+                    addEvent(data);
+                });
+
+                // Обработка подключения
+                pusher.connection.bind('connected', function() {
+                    updateStatus('connected', 'Подключено к Pusher');
+                    document.getElementById('connectBtn').disabled = true;
+                    document.getElementById('disconnectBtn').disabled = false;
+                });
+
+                // Обработка отключения
+                pusher.connection.bind('disconnected', function() {
+                    updateStatus('disconnected', 'Отключено от Pusher');
+                });
+
+                // Обработка ошибок
+                pusher.connection.bind('error', function(err) {
+                    updateStatus('error', 'Ошибка: ' + err.error.message);
+                });
+
+            } catch (error) {
+                updateStatus('error', 'Ошибка подключения: ' + error.message);
+            }
+        }
+
+        function disconnect() {
+            if (pusher) {
+                pusher.disconnect();
+                pusher = null;
+                channel = null;
+                updateStatus('disconnected', 'Отключено');
+                document.getElementById('connectBtn').disabled = false;
+                document.getElementById('disconnectBtn').disabled = true;
+            }
+        }
+
+        function updateStatus(type, message) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = 'status ' + type;
+            statusDiv.textContent = message;
+        }
+
+        function addEvent(data) {
+            const eventsList = document.getElementById('eventsList');
+            const eventDiv = document.createElement('div');
+            eventDiv.className = 'event';
+            
+            const time = new Date().toLocaleTimeString('ru-RU');
+            eventDiv.innerHTML = `
+                <div class="event-time">🕐 ${time}</div>
+                <div><strong>Событие:</strong> stats.updated</div>
+                <div><strong>Профиль:</strong> ${data.nickname} (ID: ${data.id})</div>
+                <div class="event-data">${JSON.stringify(data, null, 2)}</div>
+            `;
+            
+            eventsList.insertBefore(eventDiv, eventsList.firstChild);
+        }
+
+        // Автоматическая загрузка ключей из API
+        window.addEventListener('load', function() {
+            // Пытаемся загрузить из API
+            fetch('/pusher-config')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.key) {
+                        document.getElementById('pusherKey').value = data.key;
+                    }
+                    if (data.cluster) {
+                        document.getElementById('pusherCluster').value = data.cluster;
+                    }
+                })
+                .catch(() => {
+                    // Если API не доступен, загружаем из localStorage
+                    const savedKey = localStorage.getItem('pusherKey');
+                    const savedCluster = localStorage.getItem('pusherCluster');
+                    if (savedKey) {
+                        document.getElementById('pusherKey').value = savedKey;
+                    }
+                    if (savedCluster) {
+                        document.getElementById('pusherCluster').value = savedCluster;
+                    }
+                });
+        });
+
+        // Сохраняем ключи в localStorage
+        document.getElementById('connectBtn').addEventListener('click', function() {
+            const key = document.getElementById('pusherKey').value;
+            const cluster = document.getElementById('pusherCluster').value;
+            if (key) localStorage.setItem('pusherKey', key);
+            if (cluster) localStorage.setItem('pusherCluster', cluster);
+        });
+    </script>
+</body>
+</html>
+
