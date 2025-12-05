@@ -14,7 +14,7 @@ class ListProfilesUseCase
 
     public function execute(int $limit = 50, int $offset = 0): array
     {
-        // Валидация параметров пагинации
+        // валидация параметров пагинации
         [$validLimit, $validOffset] = InputValidator::validatePaginationParams($limit, $offset);
         
         return $this->profiles->list($validLimit, $validOffset);

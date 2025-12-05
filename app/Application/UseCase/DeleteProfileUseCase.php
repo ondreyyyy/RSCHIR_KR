@@ -13,11 +13,11 @@ class DeleteProfileUseCase
     }
 
     /**
-     * @throws \RuntimeException Если профиль не найден.
+     * @throws \RuntimeException если профиль не найден
      */
     public function execute(int $id): void
     {
-        // Валидация ID профиля
+        // валидация id профиля
         $validatedId = InputValidator::validateProfileId($id);
         
         $profile = $this->profiles->findById($validatedId);

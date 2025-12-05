@@ -84,7 +84,7 @@ class CreateProfileUseCaseTest extends TestCase
 
         $result = $this->useCase->execute($externalId, $nickname, $statsData);
 
-        // Проверяем, что XSS был удален
+        //проверка что xss был удален
         $this->assertStringNotContainsString('<script>', $result->getNickname());
     }
 

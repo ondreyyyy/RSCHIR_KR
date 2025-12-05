@@ -5,12 +5,8 @@ namespace App\Infrastructure\Broadcast;
 use App\Application\Ports\BroadcasterInterface;
 use Pusher\Pusher;
 
-/**
- * Реализация BroadcasterInterface через сервис Pusher.
- *
- * На защите можно показать, что используется готовый WebSocket-провайдер,
- * но доменный/приложенческий код от него не зависит.
- */
+//реализация BroadcasterInterface через pusher
+
 class PusherBroadcaster implements BroadcasterInterface
 {
     private Pusher $pusher;
@@ -32,22 +28,20 @@ class PusherBroadcaster implements BroadcasterInterface
 
     public function broadcast(string $channel, string $event, array $payload): void
     {
-        // Проверяем, настроен ли Pusher (если ключи пустые, пропускаем broadcast)
+        // проверка настроен ли pusher (если ключи пустые - пропуск broadcast)
         $appId = $_ENV['PUSHER_APP_ID'] ?? '';
         $key = $_ENV['PUSHER_KEY'] ?? '';
         $secret = $_ENV['PUSHER_SECRET'] ?? '';
         
         if (empty($appId) || empty($key) || empty($secret)) {
-            // Pusher не настроен - просто пропускаем broadcast без ошибки
-            // Это позволяет работать приложению без real-time функционала
+            // pusher не настроен - пропуск broadcast без ошибки (для работы приложения без realtime функционала)
             return;
         }
         
         try {
             $this->pusher->trigger($channel, $event, $payload);
         } catch (\Exception $e) {
-            // Логируем ошибку, но не прерываем выполнение
-            // Это позволяет обновлять статистику даже если Pusher недоступен
+            // логирование ошибки но без прерывания выполнение (для обновления статистики если pusher недоступен)
             error_log('Pusher broadcast error: ' . $e->getMessage());
         }
     }

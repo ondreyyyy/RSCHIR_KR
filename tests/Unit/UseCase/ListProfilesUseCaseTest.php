@@ -58,7 +58,7 @@ class ListProfilesUseCaseTest extends TestCase
 
     public function testExecuteValidatesPaginationParams(): void
     {
-        // Тест на валидацию limit (должен быть минимум 1)
+        //тест на валидацию limit (должен быть минимум 1)
         $this->repository
             ->expects($this->once())
             ->method('list')

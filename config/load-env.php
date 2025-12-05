@@ -1,8 +1,6 @@
 <?php
 
-/**
- * Простая загрузка переменных из .env файла
- */
+//загрузка переменных из env файла
 function loadEnv($filePath)
 {
     if (!file_exists($filePath)) {
@@ -12,21 +10,21 @@ function loadEnv($filePath)
     $lines = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     
     foreach ($lines as $line) {
-        // Пропускаем комментарии
+        //пропуск комментариев
         if (strpos(trim($line), '#') === 0) {
             continue;
         }
 
-        // Парсим KEY=VALUE
+        //парсинг key=value
         if (strpos($line, '=') !== false) {
             list($key, $value) = explode('=', $line, 2);
             $key = trim($key);
             $value = trim($value);
             
-            // Убираем кавычки если есть
+            //удаление кавычек
             $value = trim($value, '"\'');
             
-            // Устанавливаем переменную окружения только если она ещё не установлена
+            //установка переменной окружения только если она ещё не установлена
             if (!getenv($key)) {
                 putenv("$key=$value");
                 $_ENV[$key] = $value;
@@ -35,7 +33,7 @@ function loadEnv($filePath)
     }
 }
 
-// Загружаем .env файл из корня проекта
+//загрузка env файла из корня проекта
 $envPath = __DIR__ . '/../.env';
 loadEnv($envPath);
 

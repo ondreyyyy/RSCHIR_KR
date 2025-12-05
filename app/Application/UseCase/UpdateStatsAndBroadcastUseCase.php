@@ -17,14 +17,14 @@ class UpdateStatsAndBroadcastUseCase
     }
 
     /**
-     * @throws \RuntimeException Если профиль не найден.
+     * @throws \RuntimeException если профиль не найден
      */
     public function execute(int $profileId, array $statsData): Profile
     {
-        // Валидация ID профиля
+        // валидация id профиля
         $validatedProfileId = InputValidator::validateProfileId($profileId);
         
-        // Валидация статистики
+        // валидация статистики
         $validatedStats = InputValidator::validateStats($statsData);
 
         $profile = $this->profiles->findById($validatedProfileId);
@@ -36,7 +36,7 @@ class UpdateStatsAndBroadcastUseCase
         $profile->setStats(Stats::fromArray($validatedStats));
         $updated = $this->profiles->update($profile);
 
-        // Уникальный функционал: broadcast события обновления статов
+        // broadcast события обновления информации
         $this->broadcaster->broadcast(
             channel: 'profiles',
             event: 'stats.updated',

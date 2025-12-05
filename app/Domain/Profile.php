@@ -2,17 +2,13 @@
 
 namespace App\Domain;
 
-/**
- * Доменная сущность "Профиль игрока".
- *
- * В Clean Architecture доменная модель не знает ничего
- * о базе данных, HTTP и т.п.
- */
+//доменная сущность профиль
+
 class Profile
 {
     public function __construct(
         private ?int $id,
-        private string $externalId, // например, SteamID или другой внешний идентификатор
+        private string $externalId,
         private string $nickname,
         private Stats $stats
     ) {

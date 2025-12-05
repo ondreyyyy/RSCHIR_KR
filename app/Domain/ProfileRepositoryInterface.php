@@ -2,11 +2,8 @@
 
 namespace App\Domain;
 
-/**
- * Репозиторий как абстракция хранилища профилей.
- * Инфраструктурный слой будет реализовывать этот интерфейс
- * для PostgreSQL.
- */
+//репозиторий как абстракция хранилища профилей
+
 interface ProfileRepositoryInterface
 {
     public function create(Profile $profile): Profile;
@@ -20,8 +17,7 @@ interface ProfileRepositoryInterface
     public function findByExternalId(string $externalId): ?Profile;
 
     /**
-     * Примитивный листинг профилей с пагинацией.
-     *
+     * листинг профилей с пагинацией
      * @return Profile[]
      */
      public function list(int $limit = 50, int $offset = 0): array;

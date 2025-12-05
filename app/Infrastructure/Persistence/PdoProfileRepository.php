@@ -7,9 +7,7 @@ use App\Domain\ProfileRepositoryInterface;
 use App\Domain\Stats;
 use PDO;
 
-/**
- * PostgreSQL-реализация репозитория через PDO.
- */
+// postgresql реализация через pdo
 class PdoProfileRepository implements ProfileRepositoryInterface
 {
     public function __construct(
@@ -42,7 +40,7 @@ class PdoProfileRepository implements ProfileRepositoryInterface
                 SET external_id = :external_id,
                     nickname = :nickname,
                     stats_json = :stats_json,
-                    updated_at = NOW()
+                    updated_at = CURRENT_TIMESTAMP
                 WHERE id = :id';
 
         $stmt = $this->connection->prepare($sql);

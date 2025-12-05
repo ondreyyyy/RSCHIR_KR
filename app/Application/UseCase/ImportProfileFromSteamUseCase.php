@@ -16,9 +16,8 @@ class ImportProfileFromSteamUseCase
     ) {
     }
 
-    /**
-     * Импортирует или обновляет профиль из Steam по API-ключу и SteamID.
-     */
+    //импортирует или обновляет профиль из Steam по api ключу и steamid
+
     public function execute(string $apiKey, string $steamId): Profile
     {
         // Валидация Steam API ключа и SteamID
@@ -31,7 +30,7 @@ class ImportProfileFromSteamUseCase
 
         if ($profile) {
             $profile->setNickname($data['nickname']);
-            // при необходимости можно маппить статистику, здесь — пустой объект
+            // при необходимости можно маппить статистику. здесь — пустой объект
             $profile->setStats(Stats::fromArray([]));
             $this->profiles->update($profile);
 

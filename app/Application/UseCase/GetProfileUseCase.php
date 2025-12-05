@@ -15,7 +15,7 @@ class GetProfileUseCase
 
     public function execute(int $id): ?Profile
     {
-        // Валидация ID профиля
+        // валидация id профиля
         $validatedId = InputValidator::validateProfileId($id);
         
         return $this->profiles->findById($validatedId);

@@ -141,42 +141,42 @@
                 return;
             }
 
-            // Отключаемся от предыдущего подключения, если есть
+            //отключение от предыдущего подключения если есть
             if (pusher) {
                 disconnect();
             }
 
             try {
-                // Инициализация Pusher
+                //инициализация pusher
                 pusher = new Pusher(key, {
                     cluster: cluster,
                     encrypted: true
                 });
 
-                // Обновляем статус
+                //обновление статуса
                 updateStatus('connected', 'Подключено к Pusher');
 
-                // Подписываемся на канал 'profiles'
+                //подписка на канал profiles
                 channel = pusher.subscribe('profiles');
                 
-                // Слушаем событие 'stats.updated'
+                //прослушевание событий stats updated
                 channel.bind('stats.updated', function(data) {
                     addEvent(data);
                 });
 
-                // Обработка подключения
+                //обработка подключения
                 pusher.connection.bind('connected', function() {
                     updateStatus('connected', 'Подключено к Pusher');
                     document.getElementById('connectBtn').disabled = true;
                     document.getElementById('disconnectBtn').disabled = false;
                 });
 
-                // Обработка отключения
+                //обработка отключения
                 pusher.connection.bind('disconnected', function() {
                     updateStatus('disconnected', 'Отключено от Pusher');
                 });
 
-                // Обработка ошибок
+                //обработка ошибок
                 pusher.connection.bind('error', function(err) {
                     updateStatus('error', 'Ошибка: ' + err.error.message);
                 });
@@ -219,9 +219,9 @@
             eventsList.insertBefore(eventDiv, eventsList.firstChild);
         }
 
-        // Автоматическая загрузка ключей из API
+        //автоматическая загрузка ключей из api
         window.addEventListener('load', function() {
-            // Пытаемся загрузить из API
+            //попытка загрузить из api
             fetch('/pusher-config')
                 .then(response => response.json())
                 .then(data => {
@@ -233,7 +233,7 @@
                     }
                 })
                 .catch(() => {
-                    // Если API не доступен, загружаем из localStorage
+                    //если api не доступен - загрузка из localstorage
                     const savedKey = localStorage.getItem('pusherKey');
                     const savedCluster = localStorage.getItem('pusherCluster');
                     if (savedKey) {
@@ -245,7 +245,7 @@
                 });
         });
 
-        // Сохраняем ключи в localStorage
+        //сохранение ключей в localstorage
         document.getElementById('connectBtn').addEventListener('click', function() {
             const key = document.getElementById('pusherKey').value;
             const cluster = document.getElementById('pusherCluster').value;

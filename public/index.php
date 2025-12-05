@@ -44,14 +44,14 @@ $deleteProfile = new DeleteProfileUseCase($profileRepository);
 $updateStatsAndBroadcast = new UpdateStatsAndBroadcastUseCase($profileRepository, $broadcaster);
 $importFromSteam = new ImportProfileFromSteamUseCase($profileRepository, $steamClient);
 
-// Примитивный роутер без фреймворка
+//роутер без фреймворка
 $method = $_SERVER['REQUEST_METHOD'];
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 header('Content-Type: application/json; charset=utf-8');
 
 try {
-    // Обработка корневого маршрута
+    //обработка корневого маршрута
     if ($path === '/' && $method === 'GET') {
         $baseUrl = 'http://' . $_SERVER['HTTP_HOST'];
         
@@ -77,7 +77,7 @@ try {
     if ($path === '/profiles' && $method === 'GET') {
         $limit = (int) ($_GET['limit'] ?? 50);
         $offset = (int) ($_GET['offset'] ?? 0);
-        // Валидация параметров пагинации
+        //валидация параметров пагинации
         [$validLimit, $validOffset] = InputValidator::validatePaginationParams($limit, $offset);
         $profiles = $listProfiles->execute($validLimit, $validOffset);
 
@@ -96,7 +96,7 @@ try {
 
     if (preg_match('#^/profiles/(\d+)$#', $path, $matches)) {
         $id = (int) $matches[1];
-        // Валидация ID
+        //валидация id
         $id = InputValidator::validateProfileId($id);
 
         if ($method === 'GET') {
@@ -147,7 +147,7 @@ try {
     if ($path === '/stats/update' && $method === 'POST') {
         $body = json_decode(file_get_contents('php://input'), true, 512, JSON_THROW_ON_ERROR);
         $id = (int) ($body['id'] ?? 0);
-        // Валидация ID
+        //валидация id
         $id = InputValidator::validateProfileId($id);
 
         try {
@@ -193,7 +193,7 @@ try {
         exit;
     }
 
-    // Endpoint для получения публичного Pusher ключа (для тестирования real-time)
+    //endpoint для получения публичного pusher ключа
     if ($method === 'GET' && $path === '/pusher-config') {
         echo json_encode([
             'key' => $_ENV['PUSHER_KEY'] ?? '',

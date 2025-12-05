@@ -18,7 +18,3 @@ composer.phar
 # OS
 .DS_Store
 Thumbs.db
-
-# Docker volumes (опционально, если не хочешь коммитить данные)
-# postgres_data/
-

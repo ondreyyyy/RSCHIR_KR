@@ -14,10 +14,10 @@ use App\Infrastructure\Steam\SteamHttpClient;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-// Загрузка переменных из .env файла
+//загрузка переменных из env 
 require __DIR__ . '/../config/load-env.php';
 
-// Конфигурация БД такая же, как у API
+//конфигурация бд такая же как у api
 $dbConfig = require __DIR__ . '/../config/database.php';
 
 $pdo = new PDO(
@@ -30,7 +30,7 @@ $pdo = new PDO(
     ]
 );
 
-// Инициализация репозитория и юзкейсов
+//инициализация репозитория и юзкейсов
 $profileRepository = new PdoProfileRepository($pdo);
 $broadcaster = new PusherBroadcaster();
 $steamClient = new SteamHttpClient();
@@ -46,7 +46,7 @@ $action = $_GET['action'] ?? 'home';
 $message = null;
 $error = null;
 
-// Обработка простых POST-действий
+//обработка post действий
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'create_profile') {
         $externalId = (string)($_POST['external_id'] ?? '');
@@ -100,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Для отображения списка профилей сразу получим данные
+//получение данных для отображения списка профилей
 $profiles = $listProfiles->execute(50, 0);
 
 ?>

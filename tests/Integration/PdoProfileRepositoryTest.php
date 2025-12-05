@@ -15,12 +15,12 @@ class PdoProfileRepositoryTest extends TestCase
 
     protected function setUp(): void
     {
-        // Используем тестовую БД или in-memory SQLite для тестов
+        // использование тестовой бд или inmemory sqlite для тестов
         $dsn = getenv('TEST_DB_DSN') ?: 'sqlite::memory:';
         $this->pdo = new PDO($dsn);
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        // Создаем таблицу для тестов
+        // создание таблицы для тестов
         $this->pdo->exec('
             CREATE TABLE IF NOT EXISTS profiles (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,7 +37,7 @@ class PdoProfileRepositoryTest extends TestCase
 
     protected function tearDown(): void
     {
-        // Очищаем таблицу после каждого теста
+        // очистка таблицы после каждого теста
         $this->pdo->exec('DELETE FROM profiles');
     }
 
@@ -157,7 +157,7 @@ class PdoProfileRepositoryTest extends TestCase
 
     public function testPreparedStatementsProtectAgainstSqlInjection(): void
     {
-        // Попытка SQL инъекции через external_id
+        // попытка sql инъекции через external_id
         $maliciousId = "'; DROP TABLE profiles; --";
         
         try {
@@ -170,13 +170,13 @@ class PdoProfileRepositoryTest extends TestCase
             
             $this->repository->create($profile);
             
-            // Если таблица все еще существует, значит инъекция не сработала
+            // если таблица все еще существует - инъекция не сработала
             $stmt = $this->pdo->query("SELECT COUNT(*) FROM profiles");
             $count = $stmt->fetchColumn();
             
             $this->assertIsNumeric($count);
         } catch (\Exception $e) {
-            // Ожидаем ошибку валидации, но не SQL инъекцию
+            // ожидание ошибки валидации но не инъекцию
             $this->assertStringNotContainsString('DROP TABLE', $e->getMessage());
         }
     }

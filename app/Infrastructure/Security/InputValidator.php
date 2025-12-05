@@ -2,21 +2,17 @@
 
 namespace App\Infrastructure\Security;
 
-/**
- * Класс для валидации и санитизации входных данных.
- * Защита от XSS атак и некорректных данных.
- */
+//класс для валидации и защиты от атак и некорректных данных
+
 class InputValidator
 {
-    /**
-     * Валидация и санитизация строки (защита от XSS).
-     */
+    //валидация и санитизация строки защита от (xss)
     public static function sanitizeString(string $value, int $maxLength = 255): string
     {
-        // Удаляем HTML теги и экранируем специальные символы
+        // удаление html тегов и экранирование специальных символов
         $sanitized = htmlspecialchars(strip_tags(trim($value)), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         
-        // Ограничиваем длину
+        // ограничение длинны
         if (mb_strlen($sanitized) > $maxLength) {
             $sanitized = mb_substr($sanitized, 0, $maxLength);
         }
@@ -24,9 +20,7 @@ class InputValidator
         return $sanitized;
     }
 
-    /**
-     * Валидация external ID (SteamID и т.д.).
-     */
+    //валидация external id
     public static function validateExternalId(string $externalId): string
     {
         $externalId = trim($externalId);
@@ -39,7 +33,7 @@ class InputValidator
             throw new \InvalidArgumentException('External ID is too long (max 64 characters)');
         }
         
-        // Разрешаем только буквы, цифры, дефисы и подчеркивания
+        // только буквы цифры дефисы и подчеркивания
         if (!preg_match('/^[a-zA-Z0-9_-]+$/', $externalId)) {
             throw new \InvalidArgumentException('External ID contains invalid characters');
         }
@@ -47,9 +41,7 @@ class InputValidator
         return $externalId;
     }
 
-    /**
-     * Валидация nickname.
-     */
+    //валидация nickname 
     public static function validateNickname(string $nickname): string
     {
         $nickname = trim($nickname);
@@ -62,13 +54,11 @@ class InputValidator
             throw new \InvalidArgumentException('Nickname is too long (max 255 characters)');
         }
         
-        // Санитизация от XSS
+        // xss защита
         return self::sanitizeString($nickname, 255);
     }
 
-    /**
-     * Валидация ID профиля.
-     */
+    //валидация id
     public static function validateProfileId($id): int
     {
         if (!is_numeric($id)) {
@@ -84,9 +74,7 @@ class InputValidator
         return $id;
     }
 
-    /**
-     * Валидация статистики.
-     */
+    //валидация статистики
     public static function validateStats(array $stats): array
     {
         $validated = [
@@ -99,9 +87,7 @@ class InputValidator
         return $validated;
     }
 
-    /**
-     * Валидация целого числа.
-     */
+    //валидация целого числа
     private static function validateInt($value, int $min, int $max, int $default): int
     {
         if (!is_numeric($value)) {
@@ -121,9 +107,7 @@ class InputValidator
         return $intValue;
     }
 
-    /**
-     * Валидация Steam API ключа.
-     */
+    //валидация steam api ключа
     public static function validateSteamApiKey(string $apiKey): string
     {
         $apiKey = trim($apiKey);
@@ -140,9 +124,7 @@ class InputValidator
         return $apiKey;
     }
 
-    /**
-     * Валидация SteamID.
-     */
+    //валидация steamid
     public static function validateSteamId(string $steamId): string
     {
         $steamId = trim($steamId);
@@ -159,9 +141,7 @@ class InputValidator
         return $steamId;
     }
 
-    /**
-     * Валидация параметров пагинации.
-     */
+    //валидация параметров пагинации
     public static function validatePaginationParams($limit, $offset): array
     {
         $validLimit = self::validateInt($limit, 1, 100, 50);
