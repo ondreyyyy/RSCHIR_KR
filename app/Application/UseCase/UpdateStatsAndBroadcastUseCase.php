@@ -16,9 +16,7 @@ class UpdateStatsAndBroadcastUseCase
     ) {
     }
 
-    /**
-     * @throws \RuntimeException если профиль не найден
-     */
+    // \RuntimeException если профиль не найден
     public function execute(int $profileId, array $statsData): Profile
     {
         // валидация id профиля

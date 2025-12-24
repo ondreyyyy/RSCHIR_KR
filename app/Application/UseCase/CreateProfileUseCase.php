@@ -16,7 +16,7 @@ class CreateProfileUseCase
 
     public function execute(string $externalId, string $nickname, array $statsData): Profile
     {
-        // Валидация и санитизация входных данных (защита от XSS)
+        // валидация и санитизация входных данных
         $validatedExternalId = InputValidator::validateExternalId($externalId);
         $validatedNickname = InputValidator::validateNickname($nickname);
         $validatedStats = InputValidator::validateStats($statsData);

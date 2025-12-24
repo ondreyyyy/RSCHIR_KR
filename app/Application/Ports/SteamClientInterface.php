@@ -7,10 +7,7 @@ namespace App\Application\Ports;
 
 interface SteamClientInterface
 {
-    /**
-     * получить базовую информацию о профиле игрока по steamid
-     * @return array ассоциативный массив с нормализованными данными профиля (external_id, nickname)
-     */
+    //получить базовую информацию о профиле игрока по steamid. array ассоциативный массив с нормализованными данными профиля
     public function fetchProfile(string $apiKey, string $steamId): array;
 }
 

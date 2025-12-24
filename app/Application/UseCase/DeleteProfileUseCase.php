@@ -12,9 +12,7 @@ class DeleteProfileUseCase
     ) {
     }
 
-    /**
-     * @throws \RuntimeException если профиль не найден
-     */
+    // \RuntimeException если профиль не найден
     public function execute(int $id): void
     {
         // валидация id профиля

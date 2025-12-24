@@ -16,10 +16,7 @@ interface ProfileRepositoryInterface
 
     public function findByExternalId(string $externalId): ?Profile;
 
-    /**
-     * листинг профилей с пагинацией
-     * @return Profile[]
-     */
+    //листинг профилей с пагинацией
      public function list(int $limit = 50, int $offset = 0): array;
 }
 

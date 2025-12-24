@@ -6,11 +6,7 @@ namespace App\Application\Ports;
 
 interface BroadcasterInterface
 {
-    /**
-     * @param string $channel логическое имя канала
-     * @param string $event название события, например
-     * @param array  $payload произвольные данные события
-     */
+    //channel логическое имя канала, event название события, payload произвольные данные события
     public function broadcast(string $channel, string $event, array $payload): void;
 }
 
