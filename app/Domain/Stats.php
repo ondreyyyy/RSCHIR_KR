@@ -2,10 +2,8 @@
 
 namespace App\Domain;
 
-/**
- * Value Object для игровых статистик.
- * Можно расширять под нужды игры: уровень, опыт, очки, достижения и т.д.
- */
+//value object для игровых статистик
+
 class Stats
 {
     public function __construct(
